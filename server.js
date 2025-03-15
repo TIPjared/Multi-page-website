@@ -1,3 +1,4 @@
+const fs = require('fs');
 const express = require('express');
 const path = require('path');
 
@@ -25,13 +26,29 @@ app.get('/blog', (req, res) => {
 });
 
 app.get('/api/posts', (req, res) => {
-    fs.readFile(path.join(__dirname, 'data', 'posts.json'), 'utf8', (err, data) => {
+    const filePath = path.join(__dirname, 'data', 'posts.json');
+
+    if (!fs.existsSync(filePath)) {
+        console.error('❌ posts.json file not found!');
+        return res.status(500).json({ error: 'posts.json file not found' });
+    }
+
+    fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
-            return res.status(500).json({ error: 'Failed to load blog posts' });
+            console.error('❌ Error reading posts.json:', err.message);
+            return res.status(500).json({ error: 'Failed to load posts' });
         }
-        res.json(JSON.parse(data));
+
+        try {
+            const posts = JSON.parse(data);
+            res.json(posts);
+        } catch (parseError) {
+            console.error('❌ JSON Parse Error:', parseError.message);
+            res.status(500).json({ error: 'Invalid JSON format' });
+        }
     });
 });
+
 
 // Start the server
 app.listen(PORT, () => {

@@ -19,17 +19,27 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             fetch('/api/posts')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch');
+                    }
+                    return response.json();
+                })
                 .then(posts => {
                     const blogContainer = document.getElementById('blog-posts');
+                    blogContainer.innerHTML = ''; // Ensure it's not blank
                     posts.forEach(post => {
                         const postElement = document.createElement('div');
                         postElement.innerHTML = `<h2>${post.title}</h2><p>${post.content}</p>`;
                         blogContainer.appendChild(postElement);
                     });
                 })
-                .catch(error => console.error('Error loading blog posts:', error));
+                .catch(error => {
+                    console.error('Error loading blog posts:', error);
+                    document.getElementById('blog-posts').innerHTML = '<p>Error loading posts.</p>';
+                });
         });
+
     </script>
 </body>
 </html>
