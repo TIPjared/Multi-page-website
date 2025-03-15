@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <h1>Blog Posts</h1>
+    <nav>
+        <a href="/">Home</a> |
+        <a href="/about">About</a> |
+        <a href="/contact">Contact</a> |
+        <a href="/blog">Blog</a>
+    </nav>
+    <div id="blog-posts"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/posts')
+                .then(response => response.json())
+                .then(posts => {
+                    const blogContainer = document.getElementById('blog-posts');
+                    posts.forEach(post => {
+                        const postElement = document.createElement('div');
+                        postElement.innerHTML = `<h2>${post.title}</h2><p>${post.content}</p>`;
+                        blogContainer.appendChild(postElement);
+                    });
+                })
+                .catch(error => console.error('Error loading blog posts:', error));
+        });
+    </script>
+</body>
+</html>
